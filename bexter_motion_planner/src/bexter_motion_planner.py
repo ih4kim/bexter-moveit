@@ -14,6 +14,8 @@ import rospy
 import moveit_commander
 import moveit_msgs.msg
 import geometry_msgs.msg
+import actionlib
+import bexter_motion_planner.msg
 from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
@@ -41,11 +43,14 @@ def all_close(goal, actual, tolerance):
 
   return True
 
-class MoveGroupPythonIntefaceTutorial(object):
-  """MoveGroupPythonIntefaceTutorial"""
-  def __init__(self):
-    super(MoveGroupPythonIntefaceTutorial, self).__init__()
+class BexterMoveGroup(object):
+  _feedback = bexter_motion_planner.msg.GoalFeedback()
+  _result = bexter_motion_planner.msg.GoalResul()
 
+  def __init__(self):
+    super(BexterMoveGroup, self).__init__()
+    self.action_name = "Bexter Action"
+    self._as = actionlib.SimpleActionServer(self._action_name, bexter_motion_planner.msg.GoalAction, execute_cb=self.execute_cb, auto_start = False)
     ## BEGIN_SUB_TUTORIAL setup
     ##
     ## First initialize `moveit_commander`_ and a `rospy`_ node:
@@ -400,7 +405,7 @@ def main():
   try:
     print("============ Press `Enter` to begin the tutorial by setting up the moveit_commander (press ctrl-d to exit) ...")
     input()
-    tutorial = MoveGroupPythonIntefaceTutorial()
+    tutorial = BexterMoveGroup()
 
     print("============ Press `Enter` to execute a movement using a joint state goal ...")
     input()

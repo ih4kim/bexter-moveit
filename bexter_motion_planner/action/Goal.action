@@ -1,0 +1,9 @@
+#goal definition
+float32[] position
+float32[] orientation
+---
+#result definition
+bool result
+---
+#feedback
+bool status
