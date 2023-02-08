@@ -50,13 +50,8 @@ class BexterMoveGroup(object):
   def __init__(self):
     super(BexterMoveGroup, self).__init__()
     self.action_name = "Bexter Action"
-    self._as = actionlib.SimpleActionServer(self._action_name, bexter_motion_planner.msg.GoalAction, execute_cb=self.execute_cb, auto_start = False)
-    ## BEGIN_SUB_TUTORIAL setup
-    ##
-    ## First initialize `moveit_commander`_ and a `rospy`_ node:
     moveit_commander.roscpp_initialize(sys.argv)
-    rospy.init_node('move_group_python_interface_tutorial',
-                    anonymous=True)
+    self._as = actionlib.SimpleActionServer(self._action_name, bexter_motion_planner.msg.GoalAction, execute_cb=self.execute_cb, auto_start = False)
 
     ## Instantiate a `RobotCommander`_ object. This object is the outer-level interface to
     ## the robot:
@@ -114,6 +109,16 @@ class BexterMoveGroup(object):
     self.planning_frame = planning_frame
     self.eef_link = eef_link
     self.group_names = group_names
+  
+  def execute_cb(self, goal):
+    # Get end effector pose from goal
+    rate = rospy.Rate(1)
+    position = goal.position
+    orientation = goal.orientation
+    
+
+
+
 
   def go_to_joint_state(self):
     # Copy class variables to local variables to make the web tutorials more clear.
@@ -403,55 +408,10 @@ class BexterMoveGroup(object):
 
 def main():
   try:
-    print("============ Press `Enter` to begin the tutorial by setting up the moveit_commander (press ctrl-d to exit) ...")
-    input()
+    rospy.init_node("bextermovegroup")
     tutorial = BexterMoveGroup()
-
-    print("============ Press `Enter` to execute a movement using a joint state goal ...")
-    input()
-    tutorial.go_to_joint_state()
-
-    print("============ Press `Enter` to execute a movement using a pose goal ...")
-    input()
-    tutorial.go_to_pose_goal()
-
-    print("============ Press `Enter` to plan and display a Cartesian path ...")
-    input()
-    cartesian_plan, fraction = tutorial.plan_cartesian_path()
-
-    print("============ Press `Enter` to display a saved trajectory (this will replay the Cartesian path)  ...")
-    input()
-    tutorial.display_trajectory(cartesian_plan)
-
-    print("============ Press `Enter` to execute a saved path ...")
-    input()
-    tutorial.execute_plan(cartesian_plan)
-
-    print("============ Press `Enter` to add a box to the planning scene ...")
-    input()
-    tutorial.add_box()
-
-    print("============ Press `Enter` to attach a Box to the Panda robot ...")
-    input()
-    tutorial.attach_box()
-
-    print("============ Press `Enter` to plan and execute a path with an attached collision object ...")
-    input()
-    cartesian_plan, fraction = tutorial.plan_cartesian_path(scale=-1)
-    tutorial.execute_plan(cartesian_plan)
-
-    print("============ Press `Enter` to detach the box from the Panda robot ...")
-    input()
-    tutorial.detach_box()
-
-    print("============ Press `Enter` to remove the box from the planning scene ...")
-    input()
-    tutorial.remove_box()
-
-    print("============ Python tutorial demo complete!")
+    rospy.spin()
   except rospy.ROSInterruptException:
-    return
-  except KeyboardInterrupt:
     return
 
 if __name__ == '__main__':
