@@ -1,9 +1,8 @@
 #goal definition
 float32[] position
-float32[] orientation
 ---
 #result definition
-bool result
+bool status
 ---
 #feedback
-bool status
+float32 error

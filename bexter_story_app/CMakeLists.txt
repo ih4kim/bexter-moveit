@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(bexter_motion_planner)
+project(bexter_story_app)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -8,20 +8,11 @@ project(bexter_motion_planner)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-	roscpp
-	rospy
-	std_msgs
-	actionlib
-	moveit_core
-	moveit_ros_planning
-	moveit_ros_planning_interface
-	pluginlib
-	pcl_conversions
-	pcl_ros
-	geometric_shapes
-	gazebo_msgs
-	moveit_visual_tools
-	interfaces
+  roscpp
+  rospy
+  std_msgs
+  interfaces
+  actionlib
 )
 
 ## System dependencies are found with CMake's conventions
@@ -73,14 +64,14 @@ find_package(catkin REQUIRED COMPONENTS
 
 ## Generate actions in the 'action' folder
 # add_action_files(
-#   DIRECTORY action
 #   FILES
+#   Action1.action
+#   Action2.action
 # )
 
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   actionlib_msgs
 #   std_msgs
 # )
 
@@ -114,7 +105,10 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- CATKIN_DEPENDS roscpp rospy std_msgs interfaces
+#  INCLUDE_DIRS include
+#  LIBRARIES bexter_story_app
+   CATKIN_DEPENDS roscpp rospy std_msgs interfaces
+#  DEPENDS system_lib
 )
 
 ###########
@@ -130,7 +124,7 @@ include_directories(
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/bexter_motion_planner.cpp
+#   src/${PROJECT_NAME}/bexter_story_app.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -141,6 +135,8 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
+# add_executable(${PROJECT_NAME}_node src/bexter_story_app_node.cpp)
+
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
@@ -165,8 +161,8 @@ include_directories(
 
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
-catkin_install_python(PROGRAMS 
-  src/bexter_motion_planner_node.py
+catkin_install_python(PROGRAMS
+  src/simple_moveit_client.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
@@ -203,7 +199,7 @@ catkin_install_python(PROGRAMS
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_bexter_motion_planner.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_bexter_story_app.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
