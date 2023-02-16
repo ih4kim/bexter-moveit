@@ -163,6 +163,9 @@ include_directories(
 ## in contrast to setup.py, you can choose the destination
 catkin_install_python(PROGRAMS
   src/simple_moveit_client.py
+  src/story_driver.py
+  src/story_shower.py
+  src/story_reader.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

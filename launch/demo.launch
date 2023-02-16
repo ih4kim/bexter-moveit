@@ -1,0 +1,7 @@
+<launch>
+    <node pkg="bexter_story_app" type="story_reader.py" name="story_reader_node" respawn="true"/>
+    <node pkg="bexter_story_app" type="story_shower.py" name="story_shower_node" respawn="true"/>
+    <include file="$(find bexter_moveit_config)/launch/demo.launch"/>
+    <node pkg="bexter_motion_planner" type="bexter_motion_planner_node.py" name="bexter_motion_planner_node" respawn="true"/>
+    <node pkg="bexter_story_app" type="story_driver.py" name="story_driver_node" respawn="true"/>
+</launch>
