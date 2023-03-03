@@ -16,6 +16,7 @@
   <arg name="allow_trajectory_execution" default="true"/>
   <arg name="moveit_controller_manager" default="simple" />
   <arg name="fake_execution_type" default="interpolate"/>
+  <arg name="fake_execution" default="true"/>
   <arg name="max_safe_path_cost" default="1"/>
   <arg name="publish_monitored_planning_scene" default="true"/>
 
@@ -71,7 +72,8 @@
   <!-- Trajectory Execution Functionality -->
   <include ns="move_group" file="$(dirname)/trajectory_execution.launch.xml" if="$(arg allow_trajectory_execution)">
     <arg name="moveit_manage_controllers" value="true" />
-    <arg name="moveit_controller_manager" value="$(arg moveit_controller_manager)" />
+    <arg name="moveit_controller_manager" value="simple" if="$(arg fake_execution)"/>
+    <arg name="moveit_controller_manager" value="dynamixel_manipulator" unless="$(arg fake_execution)" />
     <arg name="fake_execution_type" value="$(arg fake_execution_type)" />
   </include>
 

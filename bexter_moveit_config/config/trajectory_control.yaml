@@ -1,0 +1,17 @@
+manipulator_controller:
+ joint_state_controller:
+  type: joint_state_controller/JointStateController
+  publish_rate: 50
+ arm_joint_controller:
+  type: "position_controllers/JointTrajectoryController"
+  joints:
+   - joint_1
+   - joint_2
+   - joint_3 
+  constraints:
+    goal_time: 2                   # Override default
+    stopped_velocity_tolerance: 0.02 # Override default
+  gains:
+   joint1: {p: 100.0, i: 0.0, d: 0.1}
+   joint2: {p: 100.0, i: 0.0, d: 0.1}
+   joint3: {p: 100.0, i: 0.0, d: 0.1}

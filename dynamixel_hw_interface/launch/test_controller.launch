@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+    
+  <rosparam file="$(find dynamixel_hw_interface)/config/controllers.yaml" command="load"/>
+  <arg
+    name="model" />
+  <param
+    name="robot_description"
+    textfile="$(find bexter_combined_urdf)/urdf/bexter_combined_urdf.urdf" />
+
+  <node name="dynamixel_hw_interface" pkg="dynamixel_hw_interface" type="dynamixel_hw_interface" output="screen"/>
+
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher" >
+  </node>
+  
+  <node name="rviz" pkg="rviz" type="rviz"/>
+    
+  <node name="controller_spawner" pkg="controller_manager" type="spawner" respawn="false" output="screen"
+        args="
+        	/dynamixel_manipulator/joints_update
+            /dynamixel_manipulator/joint_1
+            /dynamixel_manipulator/joint_2
+            /dynamixel_manipulator/joint_3
+        "/>
+</launch>
