@@ -1,13 +1,4 @@
 #!/usr/bin/env python
-## BEGIN_SUB_TUTORIAL imports
-##
-## To use the Python MoveIt interfaces, we will import the `moveit_commander`_ namespace.
-## This namespace provides us with a `MoveGroupCommander`_ class, a `PlanningSceneInterface`_ class,
-## and a `RobotCommander`_ class. (More on these below)
-##
-## We also import `rospy`_ and some messages that we will use:
-##
-
 import sys
 import copy
 import rospy
@@ -21,9 +12,20 @@ from math import pi
 from std_msgs.msg import String
 from moveit_commander.conversions import pose_to_list
 import pdb
+from moveit_msgs.msg import ExecuteTrajectoryActionResult
 ## END_SUB_TUTORIAL
 
-POSITION_TOLEREANCE = 0.01
+POSITION_TOLEREANCE = 0.02
+PENDING             = 0
+ACTIVE              = 1
+PREEMPTED           = 2
+SUCCEEDED           = 3
+ABORTED             = 4
+REJECTED            = 5
+PREEMPTING          = 6
+RECALLING           = 7
+RECALLED            = 8
+LOST                = 9  
 
 def all_close(goal, actual, tolerance):
   """
@@ -51,12 +53,14 @@ class BexterMoveGroup(object):
   _feedback = interfaces.msg.TargetFeedback()
   _result = interfaces.msg.TargetResult()
 
-  def __init__(self):
+  def __init__(self, rviz_mode=True):
     super(BexterMoveGroup, self).__init__()
     self._action_name = "bexter_action"
     moveit_commander.roscpp_initialize(sys.argv)
     self._as = actionlib.SimpleActionServer(self._action_name, interfaces.msg.TargetAction, execute_cb=self.execute_cb, auto_start = False)
     self._as.start()
+    self._rviz_mode = rviz_mode
+    self._result_subscriber = rospy.Subscriber("/execute_trajectory/result", ExecuteTrajectoryActionResult, self.update_result)
     ## Instantiate a `RobotCommander`_ object. This object is the outer-level interface to
     ## the robot:
     robot = moveit_commander.RobotCommander()
@@ -72,12 +76,17 @@ class BexterMoveGroup(object):
     ## This interface can be used to plan and execute motions on the Panda:
     group_name = "manipulator"
     group = moveit_commander.MoveGroupCommander(group_name)
+    group.set_max_acceleration_scaling_factor(0.8)
+    group.set_max_velocity_scaling_factor(0.8)
 
     ## We create a `DisplayTrajectory`_ publisher which is used later to publish
     ## trajectories for RViz to visualize:
-    display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
-                                                   moveit_msgs.msg.DisplayTrajectory,
-                                                   queue_size=20)
+    if rviz_mode:
+      display_trajectory_publisher = rospy.Publisher('/move_group/display_planned_path',
+                                                    moveit_msgs.msg.DisplayTrajectory,
+                                                    queue_size=20)
+      self.display_trajectory_publisher = display_trajectory_publisher
+
 
     ## END_SUB_TUTORIAL
 
@@ -109,11 +118,17 @@ class BexterMoveGroup(object):
     self.robot = robot
     self.scene = scene
     self.group = group
-    self.display_trajectory_publisher = display_trajectory_publisher
     self.planning_frame = planning_frame
     self.eef_link = eef_link
     self.group_names = group_names
-  
+    self.execute_status = -1
+    self.error = 0
+
+  def update_result(self, msg):
+    self.execute_status=msg.status.status;
+    #ROS_INFO("%i execute status",self.execute_status)
+    rospy.loginfo("Action Result: %d", self.execute_status)
+
   def execute_cb(self, goal):
     # Get end effector pose from goal
     rospy.loginfo("Recieved target: [%.2f, %.2f, %.2f]", goal.position[0], goal.position[1], goal.position[2])
@@ -127,21 +142,36 @@ class BexterMoveGroup(object):
     # Check if plan contains points
     
     if plan[0]:
+      self.execute_status = -1
       display_trajectory = moveit_msgs.msg.DisplayTrajectory()
       display_trajectory.trajectory_start = self.group.get_current_state()
       display_trajectory.trajectory.append(plan[1])
       # Publish
-      self.display_trajectory_publisher.publish(display_trajectory);
+      if self._rviz_mode:
+        self.display_trajectory_publisher.publish(display_trajectory);
       result = self.group.execute(plan_msg = plan[1], wait = False)
-      while self.get_error(position) > POSITION_TOLEREANCE:
+      while self.execute_status < 2:
         # Update feedback using error
-        self._feedback.error = self.error
+        self._feedback.error = self.get_error(position)
         self._as.publish_feedback(self._feedback)
       self.group.stop()
-      self._result.status = True
-      rospy.loginfo("Reached Target!")
-      self._as.set_succeeded(self._result) 
-
+      # match self.execute_status:
+      #   case ABORTED:
+      #     self._as.set_aborted(False, "Unsucessful during plan/execute")
+      #   case SUCCEEDED:
+      #     self._result.status = True
+      #     rospy.loginfo("Reached Target!")
+      #     self._as.set_succeeded(self._result)
+      #   case PREEMPTED:
+      #     self._as.set_preempted(text="Preempted this action") 
+      if self.execute_status == ABORTED:
+        self._as.set_aborted(False, "Unsucessful during plan/execute")
+      elif self.execute_status == SUCCEEDED:
+        self._result.status = True
+        rospy.loginfo("Reached Target!")
+        self._as.set_succeeded(self._result)
+      elif self.execute_status == PREEMPTED:
+        self._as.set_preempted(text="Preempted this action") 
     else:
       rospy.logerr("Trajectory is empty. Planning was unsuccessful.") 
       self._as.set_aborted(False, "Trajectory is empty. Planning was unsuccessful.")
@@ -156,7 +186,8 @@ class BexterMoveGroup(object):
 def main():
   try:
     rospy.init_node("bextermovegroup")
-    tutorial = BexterMoveGroup()
+    rviz_mode = rospy.get_param('/bextermovegroup/rviz_mode')
+    tutorial = BexterMoveGroup(rviz_mode)
     rospy.spin()
   except rospy.ROSInterruptException:
     return

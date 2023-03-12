@@ -99,8 +99,8 @@
     <limit
       lower="-1.57"
       upper="1.57"
-      effort="1.4"
-      velocity="0.9" />
+      effort="1.4" 
+      velocity="3.14"/> 
   </joint>
   <link
     name="link_1">
@@ -157,8 +157,8 @@
     <limit
       lower="0"
       upper="0"
-      effort="1.4"
-      velocity="0.9" />
+      effort="1.4" 
+      velocity="3.14"/>
   </joint>
   <link
     name="link_2">
@@ -216,7 +216,7 @@
       lower="-3.14"
       upper="1.57"
       effort="1.4"
-      velocity="0.9" />
+      velocity="3.14" />
   </joint>
   <link
     name="end_effector">

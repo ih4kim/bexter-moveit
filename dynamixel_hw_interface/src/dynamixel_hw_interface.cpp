@@ -1,5 +1,6 @@
 #include <dynamixel_hw_interface/dynamixel_hw_interface.hpp>
 #include <ros/console.h>
+#include <cmath> 
 
 #define ADDR_GOAL_POSITION      116
 #define LEN_GOAL_POSITION       4
@@ -16,7 +17,7 @@
 #define M_PI                    3.14159265358979323846
 #define ADDR_DRIVE_MODE         10
 #define REVERSE_MODE            1
-
+#define ANGLE_TRESHOLD          3.14159
 
 MyRobot::MyRobot(ros::NodeHandle& nh) : 
     nh_(nh),
@@ -70,44 +71,59 @@ void MyRobot::init(std::vector<JointID> joint_ids) {
         ROS_WARN("Failed to change baudrate!");
     }
     int dxl_comm_result = COMM_TX_FAIL;
-    int id_count = 0;
-    for (auto joint_id : joint_ids_) {
-        hardware_interface::JointStateHandle jointStateHandle(joint_id.name, &joint_position_[id_count], &joint_velocity_[id_count], &joint_effort_[id_count]);
-        joint_state_interface_.registerHandle(jointStateHandle);
-        hardware_interface::JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[id_count]);
-        joint_position_command_[id_count] = 0;
-        position_joint_interface_.registerHandle(jointPositionHandle);
-        id_count++;
-        // Enable Dynamixel Torque
-        bool dxl_addparam_result = false;  
-        uint8_t dxl_error = 0;
-        std::stringstream message;
+    while (dxl_comm_result != COMM_SUCCESS) {
+        int id_count = 0;
+        for (auto joint_id : joint_ids_) {
+            hardware_interface::JointStateHandle jointStateHandle(joint_id.name, &joint_position_[id_count], &joint_velocity_[id_count], &joint_effort_[id_count]);
+            joint_state_interface_.registerHandle(jointStateHandle);
+            hardware_interface::JointHandle jointPositionHandle(jointStateHandle, &joint_position_command_[id_count]);
+            joint_position_command_[id_count] = 0;
+            position_joint_interface_.registerHandle(jointPositionHandle);
+            id_count++;
+            // Enable Dynamixel Torque
+            bool dxl_addparam_result = false;  
+            uint8_t dxl_error = 0;
+            std::stringstream message;
 
-        dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_DRIVE_MODE, REVERSE_MODE, &dxl_error);
-        message = std::stringstream();
-        message << "Dynamixel "<< joint_id.id << " has been set to reverse mode";
-        print_result(dxl_comm_result, dxl_error, message.str());
+            dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_DRIVE_MODE, REVERSE_MODE, &dxl_error);
+            message = std::stringstream();
+            message << "Dynamixel "<< joint_id.id << " has been set to reverse mode";
+            print_result(dxl_comm_result, dxl_error, message.str());
+            if (dxl_comm_result != COMM_SUCCESS) {
+                break;
+            }
 
-        dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_OPERATING_MODE, POSITION, &dxl_error);
-        message = std::stringstream();
-        message << "Dynamixel "<< joint_id.id << " has been set to position mode";
-        print_result(dxl_comm_result, dxl_error, message.str());
-        
-        dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_OPERATING_MODE, EXTENDED_POSITION, &dxl_error);
-        message = std::stringstream();
-        message << "Dynamixel "<< joint_id.id << " has been set to extended mode";
-        print_result(dxl_comm_result, dxl_error, message.str());
+            dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_OPERATING_MODE, POSITION, &dxl_error);
+            message = std::stringstream();
+            message << "Dynamixel "<< joint_id.id << " has been set to position mode";
+            print_result(dxl_comm_result, dxl_error, message.str());
+            if (dxl_comm_result != COMM_SUCCESS) {
+                break;
+            }
+            
+            dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_OPERATING_MODE, EXTENDED_POSITION, &dxl_error);
+            message = std::stringstream();
+            message << "Dynamixel "<< joint_id.id << " has been set to extended mode";
+            print_result(dxl_comm_result, dxl_error, message.str());
+            if (dxl_comm_result != COMM_SUCCESS) {
+                break;
+            }
 
-        
-        
-        dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
-        message = std::stringstream();
-        message << "Dynamixel " << joint_id.id << " has been successfully connected";
-        print_result(dxl_comm_result, dxl_error, message.str());
-        dxl_addparam_result = groupSyncRead_.addParam(joint_id.id);
-        if (dxl_addparam_result != true)
-        {
-            ROS_DEBUG("[ID:%d] groupSyncRead addparam failed", joint_id.id);
+            
+            
+            dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+            message = std::stringstream();
+            message << "Dynamixel " << joint_id.id << " has been successfully connected";
+            print_result(dxl_comm_result, dxl_error, message.str());
+            if (dxl_comm_result != COMM_SUCCESS) {
+                break;
+            }
+
+            dxl_addparam_result = groupSyncRead_.addParam(joint_id.id);
+            if (dxl_addparam_result != true)
+            {
+                ROS_DEBUG("[ID:%d] groupSyncRead addparam failed", joint_id.id);
+            }
         }
     }
 
@@ -121,6 +137,7 @@ void MyRobot::update(const ros::TimerEvent& e) {
     controller_manager_->update(ros::Time::now(), elapsed_time_);
     write(elapsed_time_);
 }
+
 int MyRobot::uint_to_int(uint32_t bit) {
     // check if value is closer to 0 or highest possible value
     if (bit > MAX_POSITION - bit) {
@@ -152,11 +169,19 @@ void MyRobot::read() {
 void MyRobot::write(ros::Duration elapsed_time) {
     std::vector<std::vector<uint8_t>> param_goal_position_vec;
     int count = 0;
+    bool safe_rotation = true;
     for (auto joint_id : joint_ids_) {
         // Obtain corresponding goal position
         std::vector<uint8_t> param_goal_position;
-        int pos = int((joint_position_command_[count]*180.0/M_PI)/BIT_TO_RAD);
+        int pos = int((joint_position_command_[count]*180.0/M_PI)/BIT_TO_RAD); // In bits
         double pos_rad = joint_position_command_[count];
+        double current_rad = joint_position_[count];
+        // Check if the joint position difference is too big
+        if (abs(pos_rad-current_rad) > ANGLE_TRESHOLD) {
+            ROS_WARN("[ID:%03d] Dangerous jump in angle!! %.2f -> %.2f", joint_id.id, current_rad, pos_rad);
+            safe_rotation = false;
+            break;
+        }
         //ROS_INFO("%d pos: %.2f", joint_id.id, pos_rad);
         param_goal_position.push_back(DXL_LOBYTE(DXL_LOWORD(pos)));
         param_goal_position.push_back(DXL_HIBYTE(DXL_LOWORD(pos)));
@@ -170,10 +195,12 @@ void MyRobot::write(ros::Duration elapsed_time) {
         }
         count++;
     }
-    int dxl_comm_result = groupSyncWrite_.txPacket();
-    if (dxl_comm_result != COMM_SUCCESS) 
-        printf("%s\n", packetHandler_->getTxRxResult(dxl_comm_result));
-
+    if (safe_rotation) {
+        int dxl_comm_result = groupSyncWrite_.txPacket();
+        if (dxl_comm_result != COMM_SUCCESS) 
+            printf("%s\n", packetHandler_->getTxRxResult(dxl_comm_result));
+    }
+    
     // Clear syncwrite parameter storage
     groupSyncWrite_.clearParam();
 }
