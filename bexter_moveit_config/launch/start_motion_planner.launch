@@ -1,8 +1,10 @@
 <launch>
-  <include file="$(find bexter_moveit_config)/launch/robot_demo.launch">
+  <arg name="debug" default="false" />
+  <!-- <include file="$(find bexter_moveit_config)/launch/robot_demo.launch"  if="$(eval arg('debug') == 'false')">
     <arg name="use_rviz" value="false" />
-  </include>
+  </include> -->
   <node name="bextermovegroup" pkg="bexter_motion_planner" type="bexter_motion_planner_node.py" output="screen" clear_params="true">
        <param name="rviz_mode" value="false" /> 
+       <param name="debug" value="$(arg debug)" />
   </node>    
 </launch>

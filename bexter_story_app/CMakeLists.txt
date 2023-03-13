@@ -13,6 +13,8 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   interfaces
   actionlib
+  sensor_msgs
+  cv_bridge
 )
 
 ## System dependencies are found with CMake's conventions
@@ -107,7 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES bexter_story_app
-   CATKIN_DEPENDS roscpp rospy std_msgs interfaces
+   CATKIN_DEPENDS roscpp rospy std_msgs interfaces sensor_msgs
 #  DEPENDS system_lib
 )
 

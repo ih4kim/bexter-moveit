@@ -15,7 +15,7 @@ import pdb
 from moveit_msgs.msg import ExecuteTrajectoryActionResult
 ## END_SUB_TUTORIAL
 
-POSITION_TOLEREANCE = 0.02
+POSITION_TOLEREANCE = 0.001
 PENDING             = 0
 ACTIVE              = 1
 PREEMPTED           = 2
@@ -27,38 +27,26 @@ RECALLING           = 7
 RECALLED            = 8
 LOST                = 9  
 
-def all_close(goal, actual, tolerance):
-  """
-  Convenience method for testing if a list of values are within a tolerance of their counterparts in another list
-  @param: goal       A list of floats, a Pose or a PoseStamped
-  @param: actual     A list of floats, a Pose or a PoseStamped
-  @param: tolerance  A float
-  @returns: bool
-  """
-  all_equal = True
-  if type(goal) is list:
-    for index in range(len(goal)):
-      if abs(actual[index] - goal[index]) > tolerance:
-        return False
-
-  elif type(goal) is geometry_msgs.msg.PoseStamped:
-    return all_close(goal.pose, actual.pose, tolerance)
-
-  elif type(goal) is geometry_msgs.msg.Pose:
-    return all_close(pose_to_list(goal), pose_to_list(actual), tolerance)
-
-  return True
-
 class BexterMoveGroup(object):
   _feedback = interfaces.msg.TargetFeedback()
   _result = interfaces.msg.TargetResult()
 
-  def __init__(self, rviz_mode=True):
+  def __init__(self, rviz_mode=True, debug=False):
     super(BexterMoveGroup, self).__init__()
+    self._logger_name = "bextermovegroup"
     self._action_name = "bexter_action"
-    moveit_commander.roscpp_initialize(sys.argv)
+    self._debug = debug
     self._as = actionlib.SimpleActionServer(self._action_name, interfaces.msg.TargetAction, execute_cb=self.execute_cb, auto_start = False)
     self._as.start()
+    if not debug:
+      self.init_robot(rviz_mode)
+    else:
+      self.init_debug()
+
+
+  def init_robot(self, rviz_mode=True):
+    rospy.loginfo("Starting motion planner in robot mode", logger_name=self._logger_name)
+    moveit_commander.roscpp_initialize(sys.argv)
     self._rviz_mode = rviz_mode
     self._result_subscriber = rospy.Subscriber("/execute_trajectory/result", ExecuteTrajectoryActionResult, self.update_result)
     ## Instantiate a `RobotCommander`_ object. This object is the outer-level interface to
@@ -124,14 +112,30 @@ class BexterMoveGroup(object):
     self.execute_status = -1
     self.error = 0
 
+  def init_debug(self):
+    rospy.loginfo("Starting motion planner in debug mode", logger_name=self._logger_name)
+    self._debug_current_pose = [0.0,0.0,0.0]
+
+
   def update_result(self, msg):
     self.execute_status=msg.status.status;
     #ROS_INFO("%i execute status",self.execute_status)
     rospy.loginfo("Action Result: %d", self.execute_status)
 
   def execute_cb(self, goal):
-    # Get end effector pose from goal
     rospy.loginfo("Recieved target: [%.2f, %.2f, %.2f]", goal.position[0], goal.position[1], goal.position[2])
+    if self._debug:
+      curr_position = self._debug_current_pose
+      rospy.loginfo("Current Position: [%.2f, %.2f, %.2f]", curr_position[0], curr_position[1], curr_position[2])
+      # Simulate motion for 2 seconds
+      rospy.loginfo("Starting motion planner in debug mode", logger_name=self._logger_name)
+      rospy.sleep(2)
+      self._result.status = True
+      self._debug_current_pose = goal.position
+      self._as.set_succeeded(self._result)
+      return
+    
+    # Get end effector pose from goal
     curr_position = self.group.get_current_pose().pose.position
     rospy.loginfo("Current Position: [%.2f, %.2f, %.2f]", curr_position.x, curr_position.y, curr_position.z)
     position = goal.position
@@ -152,18 +156,15 @@ class BexterMoveGroup(object):
       result = self.group.execute(plan_msg = plan[1], wait = False)
       while self.execute_status < 2:
         # Update feedback using error
+        if (self._as.is_preempt_requested()):
+          rospy.logwarn("Curent Goal preempted by user!", logger_name=self._logger_name)
+          self._as.set_preempted()
+          self.group.stop()
+          return 
         self._feedback.error = self.get_error(position)
         self._as.publish_feedback(self._feedback)
       self.group.stop()
-      # match self.execute_status:
-      #   case ABORTED:
-      #     self._as.set_aborted(False, "Unsucessful during plan/execute")
-      #   case SUCCEEDED:
-      #     self._result.status = True
-      #     rospy.loginfo("Reached Target!")
-      #     self._as.set_succeeded(self._result)
-      #   case PREEMPTED:
-      #     self._as.set_preempted(text="Preempted this action") 
+      
       if self.execute_status == ABORTED:
         self._as.set_aborted(False, "Unsucessful during plan/execute")
       elif self.execute_status == SUCCEEDED:
@@ -187,7 +188,8 @@ def main():
   try:
     rospy.init_node("bextermovegroup")
     rviz_mode = rospy.get_param('/bextermovegroup/rviz_mode')
-    tutorial = BexterMoveGroup(rviz_mode)
+    debug = rospy.get_param('/bextermovegroup/debug')
+    tutorial = BexterMoveGroup(rviz_mode, debug)
     rospy.spin()
   except rospy.ROSInterruptException:
     return

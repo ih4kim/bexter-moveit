@@ -1,0 +1,12 @@
+<launch>
+  <arg name="debug" default="false" />
+  <node name="story_reader_node" pkg="bexter_story_app" type="story_reader.py" output="screen" />
+  <node name="sound_play_node" pkg="sound_play" type="soundplay_node.py" output="screen" />
+  <include file="$(find bexter_moveit_config)/launch/start_motion_planner.launch">
+    <arg name="debug" value="$(arg debug)" />
+  </include>
+  <node name="story_driver_node" pkg="bexter_story_app" type="story_driver.py" output="screen" />
+  <node name="image_view_node" pkg="image_view" type="image_view" output="screen">
+       <remap from="image" to="/story_image" /> 
+  </node>   
+</launch>
