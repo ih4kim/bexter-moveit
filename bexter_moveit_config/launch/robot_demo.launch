@@ -1,4 +1,5 @@
 <launch>
+
   <arg name="pipeline" default="ompl" />
   <arg name="db" default="false" />
   <arg name="load_robot_description" default="true"/>
@@ -11,7 +12,6 @@
     <arg name="load_robot_description" value="true"/>
   </include> -->
   
-  <node name="dynamixel_hw_interface" pkg="dynamixel_hw_interface" type="dynamixel_hw_interface" output="screen" respawn="true"/>
 
   <node name="joint_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
 		output="screen" args="/manipulator_controller/joint_state_controller" >
@@ -42,5 +42,6 @@
   
   <!-- <node name="simple_marker" pkg="three_dof_planar_manipulator" type="simple_marker.py" output="screen"  >
   </node> -->
-    
+  <node name="dynamixel_hw_interface" pkg="dynamixel_hw_interface" type="dynamixel_hw_interface" output="screen" respawn="true"/>
+
 </launch>

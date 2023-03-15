@@ -118,7 +118,7 @@ class BexterMoveGroup(object):
 
 
   def update_result(self, msg):
-    self.execute_status=msg.status.status;
+    self.execute_status=msg.status.status
     #ROS_INFO("%i execute status",self.execute_status)
     rospy.loginfo("Action Result: %d", self.execute_status)
 
@@ -128,7 +128,7 @@ class BexterMoveGroup(object):
       curr_position = self._debug_current_pose
       rospy.loginfo("Current Position: [%.2f, %.2f, %.2f]", curr_position[0], curr_position[1], curr_position[2])
       # Simulate motion for 2 seconds
-      rospy.loginfo("Starting motion planner in debug mode", logger_name=self._logger_name)
+      rospy.loginfo("Planning in debug...", logger_name=self._logger_name)
       rospy.sleep(2)
       self._result.status = True
       self._debug_current_pose = goal.position

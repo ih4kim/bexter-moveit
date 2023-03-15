@@ -166,8 +166,7 @@ include_directories(
 catkin_install_python(PROGRAMS
   src/simple_moveit_client.py
   src/story_driver.py
-  src/story_shower.py
-  src/story_reader.py
+  src/story_fetcher.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
