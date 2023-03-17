@@ -1,0 +1,274 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="bexter_urdf_final_combined">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="0.2616 -0.00030313 0.036246"
+        rpy="0 0 0" />
+      <mass
+        value="34.554" />
+      <inertia
+        ixx="5.7729"
+        ixy="-0.00016645"
+        ixz="-0.00062495"
+        iyy="1.467"
+        iyz="-0.00017016"
+        izz="7.1736" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/base_link.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/base_link.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="link_0">
+    <inertial>
+      <origin
+        xyz="-1.0459E-05 -0.00048941 -0.02575"
+        rpy="0 0 0" />
+      <mass
+        value="0.045956" />
+      <inertia
+        ixx="1.1423E-05"
+        ixy="5.2331E-09"
+        ixz="4.4082E-09"
+        iyy="1.0126E-05"
+        iyz="-2.555E-07"
+        izz="6.9187E-06" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/link_0.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/link_0.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_1"
+    type="continuous">
+    <origin
+      xyz="0.026793 -0.1635 0.33675"
+      rpy="0 0 0" />
+    <parent
+      link="base_link" />
+    <child
+      link="link_0" />
+    <axis
+      xyz="0 0 1" />
+    <limit
+      lower="-1.57"
+      upper="1.57"
+      effort="1.4"
+      velocity="3.14" />
+  </joint>
+  <link
+    name="link_1">
+    <inertial>
+      <origin
+        xyz="-0.00089873 1.0165E-05 -0.12022"
+        rpy="0 0 0" />
+      <mass
+        value="0.27455" />
+      <inertia
+        ixx="0.00062259"
+        ixy="4.4646E-09"
+        ixz="-2.7251E-05"
+        iyy="0.00066973"
+        iyz="2.5518E-07"
+        izz="9.9719E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/link_1.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/link_1.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_2"
+    type="revolute">
+    <origin
+      xyz="0 0 -0.0386"
+      rpy="0 0 0" />
+    <parent
+      link="link_0" />
+    <child
+      link="link_1" />
+    <axis
+      xyz="0 1 0" />
+    <limit
+      lower="0"
+      upper="0"
+      effort="1.4"
+      velocity="3.14" />
+  </joint>
+  <link
+    name="link_2">
+    <inertial>
+      <origin
+        xyz="0.096414 -8.3957E-07 -3.058E-05"
+        rpy="0 0 0" />
+      <mass
+        value="0.2174" />
+      <inertia
+        ixx="8.5594E-05"
+        ixy="1.3129E-14"
+        ixz="5.2867E-14"
+        iyy="0.00051595"
+        iyz="-6.2811E-10"
+        izz="0.00047252" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/link_2.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/link_2.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_3"
+    type="revolute">
+    <origin
+      xyz="0 -6.2E-05 -0.2209"
+      rpy="0 0 0" />
+    <parent
+      link="link_1" />
+    <child
+      link="link_2" />
+    <axis
+      xyz="0 -1 0" />
+    <limit
+      lower="-3.14"
+      upper="1.57"
+      effort="1.4"
+      velocity="3.14" />
+  </joint>
+  <link
+    name="end_effector">
+    <inertial>
+      <origin
+        xyz="-0.02175 0.13529 0.035046"
+        rpy="0 0 0" />
+      <mass
+        value="0.2174" />
+      <inertia
+        ixx="3.4269"
+        ixy="-0.01472"
+        ixz="0.36166"
+        iyy="1.5996"
+        iyz="0.008637"
+        izz="3.8564" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/end_effector.STL" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="1 1 1 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://bexter_urdf_final_combined/meshes/end_effector.STL" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="joint_end_effecot"
+    type="fixed">
+    <origin
+      xyz="0.22568 0.022495 -0.04826"
+      rpy="0 0 0" />
+    <parent
+      link="link_2" />
+    <child
+      link="end_effector" />
+    <axis
+      xyz="0 0 0" />
+  </joint>
+</robot>
