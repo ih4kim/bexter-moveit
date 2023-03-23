@@ -1,0 +1,46 @@
+<launch>
+  <node name="dynamixel_hw_interface" pkg="dynamixel_hw_interface" type="dynamixel_hw_interface" output="screen" respawn="true"/>
+  <arg name="pipeline" default="ompl" />
+  <arg name="db" default="false" />
+  <arg name="load_robot_description" default="true"/>
+  <rosparam file="$(find bexter-final-moveit-config)/config/trajectory_control.yaml" command="load"/>
+  <arg name="use_rviz" default="true" />
+  <arg name="debug" default="false" />
+  
+  <!-- Load the URDF, SRDF and other .yaml configuration files on the param server
+  <include file="$(find bexter_moveit_config)/launch/planning_context.launch">
+    <arg name="load_robot_description" value="true"/>
+  </include> -->
+  
+
+  <node name="joint_controller_spawner" pkg="controller_manager" type="spawner" respawn="false"
+		output="screen" args="/manipulator_controller/joint_state_controller" >
+  </node>
+
+  <!-- convert joint states to TF transforms for rviz, etc -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"
+	respawn="false" output="screen">
+  </node>
+  
+
+  <node name="joint_controller" pkg="controller_manager" type="spawner" respawn="false"
+    output="screen" args="/manipulator_controller/arm_joint_controller"/>
+
+ 
+
+  <include file="$(find bexter-final-moveit-config)/launch/move_group.launch">
+    <arg name="publish_monitored_planning_scene" value="true" />
+    <arg name="fake_execution" value="false" />
+    <arg name="pipeline" value="$(arg pipeline)"/>
+    <arg name="load_robot_description" value="$(arg load_robot_description)"/>
+  </include>
+
+  <include file="$(dirname)/moveit_rviz.launch" if="$(arg use_rviz)">
+    <arg name="rviz_config" value="$(dirname)/moveit.rviz"/>
+    <arg name="debug" value="$(arg debug)"/>
+  </include>
+  
+  <!-- <node name="simple_marker" pkg="three_dof_planar_manipulator" type="simple_marker.py" output="screen"  >
+  </node> -->
+
+</launch>

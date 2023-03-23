@@ -1,5 +1,7 @@
 #goal definition
 float32[] position
+bool reset
+int32 target_time
 ---
 #result definition
 bool status

@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: bexter_urdf_final_combined
+    relative_path: urdf/bexter_urdf_final_combined.urdf
+    xacro_args: ""
+  SRDF:
+    relative_path: config/bexter_urdf_final_combined.srdf
+  CONFIG:
+    author_name: Billy Kim
+    author_email: 1kimbil0305@gmail.com
+    generated_timestamp: 1679050423

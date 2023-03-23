@@ -18,6 +18,10 @@
 #define ADDR_DRIVE_MODE         10
 #define REVERSE_MODE            1
 #define ANGLE_TRESHOLD          3.14159
+#define ADDR_P_GAIN             84
+#define ADDR_I_GAIN             82
+#define ADDR_D_GAIN             80
+
 
 MyRobot::MyRobot(ros::NodeHandle& nh) : 
     nh_(nh),
@@ -84,13 +88,15 @@ void MyRobot::init(std::vector<JointID> joint_ids) {
             bool dxl_addparam_result = false;  
             uint8_t dxl_error = 0;
             std::stringstream message;
-
-            dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_DRIVE_MODE, REVERSE_MODE, &dxl_error);
-            message = std::stringstream();
-            message << "Dynamixel "<< joint_id.id << " has been set to reverse mode";
-            print_result(dxl_comm_result, dxl_error, message.str());
-            if (dxl_comm_result != COMM_SUCCESS) {
-                break;
+            // DOn't set reverse for motor 3!!
+            if (joint_id.id != 3) {
+                dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_DRIVE_MODE, REVERSE_MODE, &dxl_error);
+                message = std::stringstream();
+                message << "Dynamixel "<< joint_id.id << " has been set to reverse mode";
+                print_result(dxl_comm_result, dxl_error, message.str());
+                if (dxl_comm_result != COMM_SUCCESS) {
+                    break;
+                }
             }
 
             dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_OPERATING_MODE, POSITION, &dxl_error);
@@ -109,6 +115,30 @@ void MyRobot::init(std::vector<JointID> joint_ids) {
                 break;
             }
 
+
+            dxl_comm_result = packetHandler_->write2ByteTxRx(portHandler_, joint_id.id, ADDR_P_GAIN, joint_id.Kp, &dxl_error);
+            message = std::stringstream();
+            message << "Dynamixel "<< joint_id.id << " P has been set to " << joint_id.Kp;
+            print_result(dxl_comm_result, dxl_error, message.str());
+            if (dxl_comm_result != COMM_SUCCESS) {
+                break;
+            }
+
+            dxl_comm_result = packetHandler_->write2ByteTxRx(portHandler_, joint_id.id, ADDR_I_GAIN, joint_id.Ki, &dxl_error);
+            message = std::stringstream();
+            message << "Dynamixel "<< joint_id.id << " I has been set to " << joint_id.Ki;
+            print_result(dxl_comm_result, dxl_error, message.str());
+            if (dxl_comm_result != COMM_SUCCESS) {
+                break;
+            }
+
+            dxl_comm_result = packetHandler_->write2ByteTxRx(portHandler_, joint_id.id, ADDR_D_GAIN, joint_id.Kd, &dxl_error);
+            message = std::stringstream();
+            message << "Dynamixel "<< joint_id.id << " D has been set to " << joint_id.Kd;
+            print_result(dxl_comm_result, dxl_error, message.str());
+            if (dxl_comm_result != COMM_SUCCESS) {
+                break;
+            }
             
             
             dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
@@ -201,7 +231,7 @@ void MyRobot::write(ros::Duration elapsed_time) {
             printf("%s\n", packetHandler_->getTxRxResult(dxl_comm_result));
     }
     
-    // Clear syncwrite parameter storage
+    // // Clear syncwrite parameter storage
     groupSyncWrite_.clearParam();
 }
 
@@ -214,15 +244,24 @@ int main(int argc, char** argv)
     // Create vector for initializing nodes
     MyRobot::JointID joint_1 = {
         .name = "joint_1",
-        .id = 1
+        .id = 1,
+        .Kp = 640,
+        .Kd = 3600,
+        .Ki = 0,
     };
     MyRobot::JointID joint_2 = {
         .name = "joint_2",
-        .id = 2
+        .id = 2,
+        .Kp = 800,//2000,
+        .Kd = 3600,
+        .Ki = 0,
     };
     MyRobot::JointID joint_3 = {
         .name = "joint_3",
-        .id = 3
+        .id = 3,
+        .Kp = 640,//5000,
+        .Kd = 3600,
+        .Ki = 0,
     };
     std::vector<MyRobot::JointID> joint_ids;
     joint_ids.push_back(joint_1);

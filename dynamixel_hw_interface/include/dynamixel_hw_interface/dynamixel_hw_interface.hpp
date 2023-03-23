@@ -17,6 +17,9 @@ class MyRobot : public hardware_interface::RobotHW
         struct JointID {
             std::string name;
             int id;
+            int Kp;
+            int Kd;
+            int Ki;
         };
         MyRobot(ros::NodeHandle& nh);
         ~MyRobot();

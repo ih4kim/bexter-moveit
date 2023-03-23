@@ -1,0 +1,9 @@
+controller_list:
+  - name: /robot/limb/right
+    action_ns: follow_joint_trajectory
+    type: FollowJointTrajectory
+    default: true
+    joints:
+      - joint_1
+      - joint_2
+      - joint_3

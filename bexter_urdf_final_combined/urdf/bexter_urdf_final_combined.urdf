@@ -40,7 +40,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://bexter_urdf_final_combined/meshes/base_link.STL" />
+          filename="package://bexter_urdf_final_combined/meshes/base_link_collisional.STL" />
       </geometry>
     </collision>
   </link>
@@ -80,13 +80,13 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://bexter_urdf_final_combined/meshes/link_0.STL" />
+          filename="package://bexter_urdf_final_combined/meshes/link_0_collisional.STL" />
       </geometry>
     </collision>
   </link>
   <joint
     name="joint_1"
-    type="continuous">
+    type="revolute">
     <origin
       xyz="0.026793 -0.1635 0.33675"
       rpy="0 0 0" />
@@ -100,7 +100,7 @@
       lower="-1.57"
       upper="1.57"
       effort="1.4"
-      velocity="3.14" />
+      velocity="2.0" />
   </joint>
   <link
     name="link_1">
@@ -138,7 +138,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://bexter_urdf_final_combined/meshes/link_1.STL" />
+          filename="package://bexter_urdf_final_combined/meshes/link_1_collisional.STL" />
       </geometry>
     </collision>
   </link>
@@ -155,10 +155,10 @@
     <axis
       xyz="0 1 0" />
     <limit
-      lower="0"
-      upper="0"
+      lower="-1.57"
+      upper="1.57"
       effort="1.4"
-      velocity="3.14" />
+      velocity="2.0" />
   </joint>
   <link
     name="link_2">
@@ -196,7 +196,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://bexter_urdf_final_combined/meshes/link_2.STL" />
+          filename="package://bexter_urdf_final_combined/meshes/link_2_collisional.STL" />
       </geometry>
     </collision>
   </link>
@@ -213,10 +213,10 @@
     <axis
       xyz="0 -1 0" />
     <limit
-      lower="-3.14"
+      lower="-1.57"
       upper="1.57"
       effort="1.4"
-      velocity="3.14" />
+      velocity="2.0" />
   </joint>
   <link
     name="end_effector">
@@ -254,7 +254,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://bexter_urdf_final_combined/meshes/end_effector.STL" />
+          filename="package://bexter_urdf_final_combined/meshes/end_effector_collisional.STL" />
       </geometry>
     </collision>
   </link>

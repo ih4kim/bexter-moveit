@@ -41,7 +41,7 @@ class StoryFetcher(object):
         def on_message(data):
             if data.get("command") == "play":
                 id = data.get("storyId")
-                asyncio.run(self.main(id))
+                #asyncio.run(self.main(id))
                 rospy.loginfo("Finished getting story, passing story to action in folder %s", base_dir)
                 goal = interfaces.msg.ReadStoryGoal(path=base_dir)
                 self._bexter_client.send_goal(goal, done_cb=self.story_fetch_cb)

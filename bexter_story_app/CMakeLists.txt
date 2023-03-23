@@ -167,6 +167,7 @@ catkin_install_python(PROGRAMS
   src/simple_moveit_client.py
   src/story_driver.py
   src/story_fetcher.py
+  src/state_publisher.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

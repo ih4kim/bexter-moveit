@@ -6,7 +6,7 @@
     name="model" />
   <param
     name="robot_description"
-    textfile="$(find bexter_combined_urdf)/urdf/bexter_combined_urdf.urdf" />
+    textfile="$(find bexter_urdf_final_combined)/urdf/bexter_urdf_final_combined.urdf" />
 
   <node name="dynamixel_hw_interface" pkg="dynamixel_hw_interface" type="dynamixel_hw_interface" output="screen"/>
 
