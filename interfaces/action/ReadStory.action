@@ -1,5 +1,6 @@
 #goal definition
 string path
+int16 story_id
 ---
 #result definition
 bool status

@@ -12,6 +12,7 @@ import shutil
 import actionlib
 import actionlib_msgs.msg._GoalStatus
 import interfaces.msg
+from std_msgs.msg import Bool
 from interfaces.msg import ReadStoryAction
 
 # Hardcode location on harddrive
@@ -27,6 +28,7 @@ class StoryFetcher(object):
         rospy.loginfo("Connecting to start_bexter_action", logger_name=self.logger_name)
         self._bexter_client = actionlib.SimpleActionClient('start_bexter_action', ReadStoryAction)
         self._bexter_client.wait_for_server()
+        self._fetcher_pub = rospy.Publisher("fetcher_state", Bool, queue_size=10)
         rospy.loginfo("Connected to start_bexter_action!", logger_name=self.logger_name)
         self.setup()
 
@@ -40,12 +42,15 @@ class StoryFetcher(object):
         @self._sio.on('play')
         def on_message(data):
             if data.get("command") == "play":
+                self._fetcher_pub.publish(True)
                 id = data.get("storyId")
-                #asyncio.run(self.main(id))
+                asyncio.run(self.main(id))
                 rospy.loginfo("Finished getting story, passing story to action in folder %s", base_dir)
-                goal = interfaces.msg.ReadStoryGoal(path=base_dir)
+                print(id)
+                goal = interfaces.msg.ReadStoryGoal(path=base_dir, story_id = id)
                 self._bexter_client.send_goal(goal, done_cb=self.story_fetch_cb)
             else:
+                self._fetcher_pub.publish(False)
                 if self._bexter_client.get_state() == actionlib_msgs.msg._GoalStatus.GoalStatus.ACTIVE:
                     # cancel the current goal
                     rospy.logwarn("Cancel request from user!", logger_name=self.logger_name)

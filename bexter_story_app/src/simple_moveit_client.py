@@ -43,8 +43,8 @@ import numpy as np
 # def feedback_cb(feedback):
 #     rospy.loginfo("Error to target: %.2f", feedback.error)
 
-ICON_HEIGHT = 3
-ICON_WIDTH = 4
+ICON_HEIGHT = 4
+ICON_WIDTH = 5
 
 class BexterUnitTest(object):
 
@@ -53,8 +53,11 @@ class BexterUnitTest(object):
         # y_axis = [-0.282, -0.250, -0.214, -0.182, -0.153, -0.127, -0.100, -0.066]
         # x_axis = [0.182, 0.214, 0.246, 0.275, 0.308, 0.337]
 
-        y_axis = [-0.281, -0.209, -0.135, -0.074]
-        x_axis = [0.2, 0.27, 0.330]
+        # y_axis = [-0.281, -0.209, -0.135, -0.074]
+        # x_axis = [0.2, 0.27, 0.330]
+        # 1- L 4 - R 5 - R, 1 - L, 2- TL, 4 - R, 1 - TL, 2 -TTL, 4 - TR, 5 - T
+        y_axis = [-0.30, -0.235, -0.176, -0.11, -0.05]
+        x_axis = [0.20, 0.25, 0.31, 0.355]
         for i, x_value in enumerate(x_axis):
             for j, y_value in enumerate(y_axis):
                 self._icon_cooridinate[i][j] = [x_value, y_value, 0.02]

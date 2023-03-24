@@ -1,6 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    
+  <arg name="torque_mode" default="false" />
+  <param name="torque_mode" value="$(arg torque_mode)"/>  
   <rosparam file="$(find dynamixel_hw_interface)/config/controllers.yaml" command="load"/>
   <arg
     name="model" />

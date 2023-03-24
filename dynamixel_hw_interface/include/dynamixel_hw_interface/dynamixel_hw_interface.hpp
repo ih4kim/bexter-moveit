@@ -24,7 +24,7 @@ class MyRobot : public hardware_interface::RobotHW
         MyRobot(ros::NodeHandle& nh);
         ~MyRobot();
         void update(const ros::TimerEvent& e);
-        void init(std::vector<JointID> joint_ids);
+        void init(std::vector<JointID> joint_ids, bool torque_mode);
         void read();
         void write(ros::Duration elapsed_time);
     private:

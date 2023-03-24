@@ -1,4 +1,5 @@
 <launch>
+  <param name="torque_mode" value="true"/>
   <node name="dynamixel_hw_interface" pkg="dynamixel_hw_interface" type="dynamixel_hw_interface" output="screen" respawn="true"/>
   <arg name="pipeline" default="ompl" />
   <arg name="db" default="false" />

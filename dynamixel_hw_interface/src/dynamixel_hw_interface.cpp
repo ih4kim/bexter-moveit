@@ -58,7 +58,7 @@ void MyRobot::print_result(int dxl_comm_result, uint8_t dxl_error, std::string m
     }
 }
 
-void MyRobot::init(std::vector<JointID> joint_ids) {
+void MyRobot::init(std::vector<JointID> joint_ids, bool torque_mode) {
     joint_ids_ = joint_ids;
 
     if (portHandler_->openPort()) {
@@ -140,13 +140,14 @@ void MyRobot::init(std::vector<JointID> joint_ids) {
                 break;
             }
             
-            
-            dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
-            message = std::stringstream();
-            message << "Dynamixel " << joint_id.id << " has been successfully connected";
-            print_result(dxl_comm_result, dxl_error, message.str());
-            if (dxl_comm_result != COMM_SUCCESS) {
-                break;
+            if (torque_mode) {
+                dxl_comm_result = packetHandler_->write1ByteTxRx(portHandler_, joint_id.id, ADDR_TORQUE_ENABLE, TORQUE_ENABLE, &dxl_error);
+                message = std::stringstream();
+                message << "Dynamixel " << joint_id.id << " has been successfully connected";
+                print_result(dxl_comm_result, dxl_error, message.str());
+                if (dxl_comm_result != COMM_SUCCESS) {
+                    break;
+                }
             }
 
             dxl_addparam_result = groupSyncRead_.addParam(joint_id.id);
@@ -239,6 +240,8 @@ int main(int argc, char** argv)
 {
     ros::init(argc, argv, "dynamixel_hw_interface_node");
     ros::NodeHandle nh;
+    bool torque_mode = true;
+    nh.param<bool>("torque_mode", torque_mode, true);
     ros::MultiThreadedSpinner spinner(2);
     MyRobot dynamixel_interface(nh);
     // Create vector for initializing nodes
@@ -267,7 +270,8 @@ int main(int argc, char** argv)
     joint_ids.push_back(joint_1);
     joint_ids.push_back(joint_2);
     joint_ids.push_back(joint_3);
-    dynamixel_interface.init(joint_ids);
+    
+    dynamixel_interface.init(joint_ids, torque_mode);
     spinner.spin();
     return 0;
 } 

@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+  <arg name="torque_mode" default="true" />
+  <param name="torque_mode" value="$(arg torque_mode)"/>
+  <node name="dynamixel_hw_interface" pkg="dynamixel_hw_interface" type="dynamixel_hw_interface" output="screen"/>
+</launch>
